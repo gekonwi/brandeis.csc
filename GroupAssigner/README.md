@@ -1,6 +1,10 @@
-ranking_grader
+group_assigner
 =============
 
-The initial application of this algorithm was targeted at Brandeis University in Fall 2014. In the class CS118a Computer Supported Collaboration, taught by Prof. Richard Alterman, the students were asked to rank each others solutions anonymously within a special group setup and multiple rankings for each solution. In parallel the TAs were grading each solution.
+The initial application of this algorithm was targeted at Brandeis University in Fall 2014. In the class CS118a Computer Supported Cooperation, taught by Prof. Richard Alterman, we needed to assign students to groups with specific conditions.
 
-I proposed this algorithm for grading the students' abilities to rank their peers' solutions as close as possible to the TAs' gradings of these solutions. Therefore, of course, the students cannot know the TAs' gradings before the students define their rankings.
+During the first round students within one group were suppposed to sit next to each other. During the second round students within one group were supposed to sit as far as possible from each other.
+
+For the first round the students were guided to a Google Spreadhseet where they assigned themselves together with their neighbor to a group respectively. Each group was asked to enter their "class coordinates" (row and seat number).
+
+The algorithm takes in all this information and generates the group assignment for the second round. The input format is the result of copying the content of the Google Spreadsheet. The output format allows copy-paste into a Google Spreadsheet with correct distribution on cells.
