@@ -1,7 +1,7 @@
 group_assigner
 =============
 
-The initial application of this algorithm was targeted at Brandeis University in Fall 2014. In the class CS118a Computer Supported Collaboration, taught by Prof. Richard Alterman, we needed to assign students to groups with specific conditions.
+The initial application of this algorithm was targeted at Brandeis University in Fall 2014. In the class CS118a Computer Supported Cooperation, taught by Prof. Richard Alterman, we needed to assign students to groups with specific conditions.
 
 During the first round students within one group were suppposed to sit next to each other. During the second round students within one group were supposed to sit as far as possible from each other.
 
