@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -55,12 +56,15 @@ public class MainView extends JFrame {
 		getContentPane().add(round1Panel, gbc_round1Panel);
 		round1Panel.setLayout(new BorderLayout(0, 0));
 
-		round1TextArea = new JTextArea();
-		round1Panel.add(round1TextArea, BorderLayout.CENTER);
-
 		JLabel lblPasteTheWhole = new JLabel(
 				"Paste the whole Google Spreadsheet Round 1 here and press Generate Round 2");
 		round1Panel.add(lblPasteTheWhole, BorderLayout.NORTH);
+
+		JScrollPane round1ScrollPane = new JScrollPane();
+		round1Panel.add(round1ScrollPane, BorderLayout.CENTER);
+
+		round1TextArea = new JTextArea();
+		round1ScrollPane.setViewportView(round1TextArea);
 
 		JButton btnGenerateRound = new JButton("Generate Round 2");
 		btnGenerateRound.addActionListener(new ActionListener() {
@@ -86,13 +90,16 @@ public class MainView extends JFrame {
 		getContentPane().add(round2Panel, gbc_round2Panel);
 		round2Panel.setLayout(new BorderLayout(0, 0));
 
-		round2TextArea = new JTextArea();
-		round2TextArea.setEditable(false);
-		round2Panel.add(round2TextArea, BorderLayout.CENTER);
-
 		JLabel lblCopyThisInto = new JLabel(
 				"Copy this into the Google Spreadsheet");
 		round2Panel.add(lblCopyThisInto, BorderLayout.NORTH);
+
+		JScrollPane round2ScrollPane = new JScrollPane();
+		round2Panel.add(round2ScrollPane, BorderLayout.CENTER);
+
+		round2TextArea = new JTextArea();
+		round2ScrollPane.setViewportView(round2TextArea);
+		round2TextArea.setEditable(false);
 	}
 
 	public String getRound1Text() {
