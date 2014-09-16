@@ -16,6 +16,8 @@ import javax.swing.border.TitledBorder;
 
 public class MainView extends JFrame {
 
+	private static final long serialVersionUID = 1L;
+
 	public interface MainViewController {
 		public void generateRound2BtnPressed();
 	}

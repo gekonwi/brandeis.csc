@@ -1,20 +1,14 @@
 import java.awt.EventQueue;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
-
-import javax.swing.JOptionPane;
 
 public class Controller implements MainView.MainViewController {
 	public class MinDistanceToBigException extends Exception {
+
+		private static final long serialVersionUID = 1L;
 
 	}
 
@@ -27,8 +21,7 @@ public class Controller implements MainView.MainViewController {
 	}
 
 	private static final double ROW_FACTOR = 1.5;
-	private static final String MAP_LINKS_ROUND2_FILE_NAME = "map_links_round2.txt";
-	private static final String ROUND2_HEADLINE = "Group ID\tPerson 1\tPerson 2\tPerson 3\tYour Map";
+	private static final String ROUND2_HEADLINE = "Group ID\tPerson 1\tPerson 2\tPerson 3";
 
 	private MainView view;
 
@@ -57,40 +50,33 @@ public class Controller implements MainView.MainViewController {
 
 		double minDistance = getMaxDistance(students) / 2;
 
-		try {
-			List<Group> groups = assignStudents(students, minDistance);
-			view.setRound2Text(getRound2Text(groups));
-		} catch (CancellationException e) {
-			e.printStackTrace();
-		}
+		List<List<Student>> groups = assignStudents(students, minDistance);
+		view.setRound2Text(getRound2Text(groups));
 	}
 
-	private String getRound2Text(List<Group> groups) {
+	private String getRound2Text(List<List<Student>> groups) {
 		StringBuilder sb = new StringBuilder(ROUND2_HEADLINE + "\n");
 		for (int i = 0; i < groups.size(); i++) {
-			Group g = groups.get(i);
+			List<Student> g = groups.get(i);
 
 			sb.append(i + 1); // group ID
 			sb.append("\t");
 
-			sb.append(g.getStudents().get(0).getName());
+			sb.append(g.get(0).getName());
 			sb.append("\t");
 
-			sb.append(g.getStudents().get(1).getName());
+			sb.append(g.get(1).getName());
 			sb.append("\t");
 
-			if (g.getStudents().size() == 3)
-				sb.append(g.getStudents().get(2).getName());
-			sb.append("\t");
-
-			sb.append(g.getMapLink());
+			if (g.size() == 3)
+				sb.append(g.get(2).getName());
 			sb.append("\n");
 		}
 
 		return sb.toString();
 	}
 
-	private List<Group> assignStudents(ArrayList<Student> allStudents,
+	private List<List<Student>> assignStudents(ArrayList<Student> allStudents,
 			double minDistance) {
 		Set<Student> unassignedStudents = new HashSet<>(allStudents);
 
@@ -102,20 +88,18 @@ public class Controller implements MainView.MainViewController {
 		}
 	}
 
-	private List<Group> tryAssigningStudents(Set<Student> unassignedStudents,
-			ArrayList<Student> allStudents, double minDistance)
-			throws MinDistanceToBigException {
+	private List<List<Student>> tryAssigningStudents(
+			Set<Student> unassignedStudents, ArrayList<Student> allStudents,
+			double minDistance) throws MinDistanceToBigException {
 
-		ArrayList<Group> groups = new ArrayList<>(allStudents.size() / 2 + 1);
-
-		LinkedList<String> links = readRound2Links();
+		ArrayList<List<Student>> groups = new ArrayList<>(
+				allStudents.size() / 2 + 1);
 
 		for (Student s1 : allStudents) {
 			if (!unassignedStudents.contains(s1))
 				continue;
 
-			groups.add(assignPartner(links.poll(), s1, unassignedStudents,
-					minDistance));
+			groups.add(assignPartner(s1, unassignedStudents, minDistance));
 
 			if (unassignedStudents.size() == 1)
 				assignLastStudentAsThird(unassignedStudents, groups);
@@ -124,11 +108,11 @@ public class Controller implements MainView.MainViewController {
 		return groups;
 	}
 
-	private Group assignPartner(String mapLink, Student s1,
+	private List<Student> assignPartner(Student s1,
 			Set<Student> unassignedStudents, double minDistance)
 			throws MinDistanceToBigException {
 
-		Group group = new Group(mapLink);
+		List<Student> group = new ArrayList<>();
 
 		double bestMatchDistance = Double.MAX_VALUE;
 		Student bestMatch = null;
@@ -147,8 +131,8 @@ public class Controller implements MainView.MainViewController {
 		if (bestMatch == null)
 			throw new MinDistanceToBigException();
 
-		group.getStudents().add(s1);
-		group.getStudents().add(bestMatch);
+		group.add(s1);
+		group.add(bestMatch);
 		unassignedStudents.remove(s1);
 		unassignedStudents.remove(bestMatch);
 
@@ -156,7 +140,7 @@ public class Controller implements MainView.MainViewController {
 	}
 
 	private void assignLastStudentAsThird(Set<Student> unassignedStudents,
-			ArrayList<Group> groups) {
+			List<List<Student>> groups) {
 		if (unassignedStudents.size() != 1)
 			throw new IllegalArgumentException(
 					"there must be exactly one unassigned student remaining!");
@@ -164,36 +148,19 @@ public class Controller implements MainView.MainViewController {
 		Student lastStudent = (new ArrayList<>(unassignedStudents)).get(0);
 
 		double maxAvDist = 0;
-		Group bestMatch = null;
+		List<Student> bestGroupMatch = null;
 
-		for (Group g : groups) {
-			double dist1 = getDistance(lastStudent, g.getStudents().get(0));
-			double dist2 = getDistance(lastStudent, g.getStudents().get(1));
+		for (List<Student> g : groups) {
+			double dist1 = getDistance(lastStudent, g.get(0));
+			double dist2 = getDistance(lastStudent, g.get(1));
 			double avDist = (dist1 + dist2) / 2.0;
 			if (avDist > maxAvDist) {
 				maxAvDist = avDist;
-				bestMatch = g;
+				bestGroupMatch = g;
 			}
 		}
 
-		bestMatch.getStudents().add(lastStudent);
-	}
-
-	private LinkedList<String> readRound2Links() {
-		LinkedList<String> links = null;
-		try {
-			links = new LinkedList<>(Files.readAllLines(
-					Paths.get(MAP_LINKS_ROUND2_FILE_NAME),
-					Charset.forName("UTF-8")));
-		} catch (IOException e) {
-			String title = "Error";
-			String msg = "The file containing the map links for round 2 could not be read in.";
-			JOptionPane.showMessageDialog(view, msg, title,
-					JOptionPane.INFORMATION_MESSAGE);
-
-			throw new CancellationException();
-		}
-		return links;
+		bestGroupMatch.add(lastStudent);
 	}
 
 	private double getMaxDistance(List<Student> students) {
@@ -213,8 +180,7 @@ public class Controller implements MainView.MainViewController {
 	private double getDistance(Student s1, Student s2) {
 		double rowDif = (s2.getRow() - s1.getRow()) * ROW_FACTOR;
 		double seatDif = s2.getSeat() - s1.getSeat();
-		double dist = Math.sqrt(rowDif * rowDif + seatDif * seatDif);
-		return dist;
+		return Math.sqrt(rowDif * rowDif + seatDif * seatDif);
 	}
 
 	private Set<Student> readInStudents() {
