@@ -80,7 +80,7 @@ public class Controller implements MainView.MainViewController {
 
 	private List<List<Student>> assignStudents(ArrayList<Student> allStudents,
 			double minDistance) {
-		System.out.println("attempting to assign students with minDistance="
+		System.out.println("\nattempting to assign students with minDistance: "
 				+ minDistance);
 
 		Set<Student> unassignedStudents = new HashSet<>(allStudents);
@@ -176,17 +176,17 @@ public class Controller implements MainView.MainViewController {
 				bestGroupMatch = g;
 
 				System.out.println(String.format(
-						"\t potential match: {%s} (average distance: %f)",
+						"\t potential match: %s (average distance: %f)",
 						bestGroupMatch, maxAvDist));
 			}
 		}
 
+		System.out.println(String.format(
+				"\t => last student assigned to: %s (average distance: %f)",
+				bestGroupMatch, maxAvDist));
+
 		bestGroupMatch.add(lastStudent);
 		unassignedStudents.remove(lastStudent);
-
-		System.out.println(String.format(
-				"\t => last student assigned to: {%s} (average distance: %f)",
-				bestGroupMatch, maxAvDist));
 	}
 
 	private double getMaxDistance(List<Student> students) {
