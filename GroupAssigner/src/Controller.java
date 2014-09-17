@@ -22,6 +22,7 @@ public class Controller implements MainView.MainViewController {
 
 	private static final double ROW_FACTOR = 1.5;
 	private static final String ROUND2_HEADLINE = "Group ID\tPerson 1\tPerson 2\tPerson 3";
+	private static final int OUTPUT_ROWS = 50;
 
 	private MainView view;
 
@@ -61,21 +62,23 @@ public class Controller implements MainView.MainViewController {
 		for (int i = 0; i < groups.size(); i++) {
 			List<Student> g = groups.get(i);
 
-			sb.append(i + 1); // group ID
-			sb.append("\t");
-
-			sb.append(g.get(0).getName());
-			sb.append("\t");
-
-			sb.append(g.get(1).getName());
-			sb.append("\t");
+			sb.append((i + 1) + "\t"); // group ID
+			sb.append(g.get(0).getName() + "\t");
+			sb.append(g.get(1).getName() + "\t");
 
 			if (g.size() == 3)
 				sb.append(g.get(2).getName());
 			sb.append("\n");
 		}
 
+		addBlankRows(sb, OUTPUT_ROWS - groups.size());
+
 		return sb.toString();
+	}
+
+	private void addBlankRows(StringBuilder sb, int rowsCount) {
+		for (int i = 0; i < rowsCount; i++)
+			sb.append("\t\t\t\n");
 	}
 
 	private List<List<Student>> assignStudents(ArrayList<Student> allStudents,
