@@ -47,8 +47,10 @@ public class Controller implements MainView.MainViewController {
 	@Override
 	public void generateRound2BtnPressed() {
 		ArrayList<Student> students = new ArrayList<>(readInStudents());
+		System.out.println("read in " + students.size() + " students");
 
 		double minDistance = getMaxDistance(students) / 2;
+		System.out.println("minDistance: " + minDistance);
 
 		List<List<Student>> groups = assignStudents(students, minDistance);
 		view.setRound2Text(getRound2Text(groups));
@@ -78,6 +80,9 @@ public class Controller implements MainView.MainViewController {
 
 	private List<List<Student>> assignStudents(ArrayList<Student> allStudents,
 			double minDistance) {
+		System.out.println("attempting to assign students with minDistance="
+				+ minDistance);
+
 		Set<Student> unassignedStudents = new HashSet<>(allStudents);
 
 		try {
@@ -111,6 +116,7 @@ public class Controller implements MainView.MainViewController {
 	private List<Student> assignPartner(Student s1,
 			Set<Student> unassignedStudents, double minDistance)
 			throws MinDistanceToBigException {
+		System.out.println("\t assigning a partner for: " + s1);
 
 		List<Student> group = new ArrayList<>();
 
@@ -125,6 +131,10 @@ public class Controller implements MainView.MainViewController {
 			if (dist >= minDistance && dist < bestMatchDistance) {
 				bestMatchDistance = dist;
 				bestMatch = s2;
+
+				System.out.println(String.format(
+						"\t\t potential match: %s (distance: %f)", bestMatch,
+						bestMatchDistance));
 			}
 		}
 
@@ -135,6 +145,10 @@ public class Controller implements MainView.MainViewController {
 		group.add(bestMatch);
 		unassignedStudents.remove(s1);
 		unassignedStudents.remove(bestMatch);
+
+		System.out.println(String.format(
+				"\t\t => assigned best match: %s (distance: %f)", bestMatch,
+				getDistance(s1, bestMatch)));
 
 		return group;
 	}
@@ -147,6 +161,9 @@ public class Controller implements MainView.MainViewController {
 
 		Student lastStudent = (new ArrayList<>(unassignedStudents)).get(0);
 
+		System.out.println("assigning last student as a third to some group: "
+				+ lastStudent);
+
 		double maxAvDist = 0;
 		List<Student> bestGroupMatch = null;
 
@@ -157,10 +174,19 @@ public class Controller implements MainView.MainViewController {
 			if (avDist > maxAvDist) {
 				maxAvDist = avDist;
 				bestGroupMatch = g;
+
+				System.out.println(String.format(
+						"\t potential match: {%s} (average distance: %f)",
+						bestGroupMatch, maxAvDist));
 			}
 		}
 
 		bestGroupMatch.add(lastStudent);
+		unassignedStudents.remove(lastStudent);
+
+		System.out.println(String.format(
+				"\t => last student assigned to: {%s} (average distance: %f)",
+				bestGroupMatch, maxAvDist));
 	}
 
 	private double getMaxDistance(List<Student> students) {
